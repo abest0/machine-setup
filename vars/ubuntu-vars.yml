@@ -1,0 +1,14 @@
+---
+packages:
+  - build-essential
+  - git
+  - jq
+  - silversearcher-ag
+  - htop
+  - python3
+  - zsh
+  - tmux
+  - tree
+  - vim
+  - direnv
+  - docker

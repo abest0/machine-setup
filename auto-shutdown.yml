@@ -1,0 +1,16 @@
+---
+- name: Add shutdown server shell file
+  copy:
+    src: "files/{{ ansible_distribution | lower }}-stop-if-inactive.sh"
+    dest: /usr/local/sbin/stop-if-inactive.sh
+    mode: u=rwx,g=r,o=r
+  tags:
+    - shutdown
+
+- name: Add cron job to execute shutdown script
+  cron:
+    name: 'shutdown when inactive'
+    job: /usr/local/sbin/stop-if-inactive.sh
+    user: root
+  tags:
+    - shutdown

@@ -1,0 +1,279 @@
+---
+- hosts: all
+  become: yes
+
+  vars:
+    dev_user: dev
+    remote_access_pem: ~/.ssh/laptop_112020.pem
+
+  tasks:
+    - name: Gather os specific variables
+      include_vars: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          files:
+            - "{{ ansible_distribution | lower}}-vars.yml"
+            - "{{ ansible_distribution | lower}}.yml"
+          paths:
+            - 'vars'
+      tags: vars
+
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+      tags:
+        - admin
+
+    - include: user.yml
+
+    - import_role:
+        name: geerlingguy.repo-epel
+      vars:
+        epel_repo_url: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
+        epel_repo_gpg_key_url: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7'
+      when: ansible_distribution == 'Amazon'
+
+    - name: Add an APT repo for updated packages
+      apt_repository:
+        repo: ppa:jonathonf/vim
+        state: present
+      when: ansible_distribution == 'Ubuntu'
+      tags: dev
+
+    - name: Install core dev packages
+      package: name={{ item }} state=latest
+      loop: "{{ packages | flatten }}"
+      tags:
+        - dev
+
+    - import_role:
+        name: geerlingguy.pip
+      vars:
+        pip_package: python3-pip
+        pip_install_packages:
+          - pipenv
+          - ipython
+      tags:
+        - apps
+        - pipenv
+
+    - import_role:
+        name: ansible-role-docker
+      vars:
+        docker_package: "docker"
+        docker_users:
+          - "{{ dev_user }}"
+      tags:
+        - apps
+        - docker
+
+    - import_role:
+        name: geerlingguy.nodejs
+      vars:
+        nodejs_install_npm_user: "{{ dev_user }}"
+        ansible_distribution_major_version: 7
+      tags:
+        - apps
+
+    - name: Get dev user home
+      become_user: "{{ dev_user }}"
+      shell: echo $HOME
+      register: dev_user_home
+
+    - name: Remove pyenv
+      become_user: "{{ dev_user }}"
+      file:
+        path: $HOME/.pyenv
+        state: absent
+
+    - name: Install pyenv
+      become_user: "{{ dev_user }}"
+      shell: curl https://pyenv.run | bash
+      tags:
+        - apps
+        - pyenv
+
+    - name: Add pyenv template
+      become_user: "{{ dev_user }}"
+      template:
+        src: templates/pyenvrc.j2
+        dest: $HOME/.pyenvrc
+        mode: u=rwx,g=rx,o=r
+      tags:
+        - bashrc
+        - pyenv
+
+    - name: Update bashrc to source the pyenv extension
+      become_user: "{{ dev_user }}"
+      lineinfile:
+        dest: $HOME/.bashrc
+        state: present
+        regexp: '^source .pyenvrc$'
+        line: 'source $HOME/.pyenvrc'
+      tags:
+        - bashrc
+        - pyenv
+
+    - name: Check if cloud9 node
+      become_user: "{{ dev_user }}"
+      stat: path=$HOME/.c9
+      register: c9_machine
+      tags: machine-role, shutdown
+
+    - name: Check oh-my-zsh installed
+      become_user: "{{ dev_user }}"
+      stat:
+        path: $HOME/.oh-my-zsh
+      register: oh_my_zsh_dir
+      tags:
+        - zsh
+
+    - name: Install oh-my-zsh
+      become_user: "{{ dev_user }}"
+      git:
+        repo: https://github.com/robbyrussell/oh-my-zsh
+        dest: $HOME/.oh-my-zsh
+        depth: 1
+      when: not oh_my_zsh_dir.stat.exists
+      tags:
+        - zsh
+
+    - name: Update shell for user profile
+      user:
+        name: "{{ dev_user }}"
+        shell: /usr/bin/zsh
+      tags:
+        - zsh
+
+    - name: Get dotfiles
+      become_user: "{{ dev_user }}"
+      git:
+        repo: https://github.com/abest0/dotfiles
+        dest: $HOME/dotfiles
+        recursive: yes
+        update: yes
+        force: yes
+      tags:
+        - dotfiles
+
+    - name: Copy gitidentity
+      become_user: "{{ dev_user }}"
+      copy:
+        src: "{{ lookup('env', 'HOME') }}/dotfiles/gitidentity"
+        dest: $HOME/dotfiles/gitidentity
+      tags:
+        - dotfiles
+
+    - name: Create dotfile back folder
+      become_user: "{{ dev_user }}"
+      file:
+        path: $HOME/backup_dotfiles
+        state: directory
+      register: backup_dir
+      tags:
+        - backup
+
+    - name: Find files to backup
+      become_user: "{{ dev_user }}"
+      find:
+        paths: $HOME
+        hidden: yes
+        patterns:
+          - .ctags
+          - .zshrc
+          - .zshenv
+          - .vimrc
+          - .vim
+          - .tmux.conf
+          - .gitconfig
+          - .psqlrc
+      register: dotfiles
+      tags:
+        - backup
+
+    - name: Backup dotfiles
+      become_user: "{{ dev_user }}"
+      copy: 
+        src: "{{ item.path }}"
+        dest: $HOME/backup_dotfiles
+        follow: yes
+        remote_src: yes
+      with_items: "{{ dotfiles.files }}"
+      tags:
+        - backup
+
+    - name: Create symlinks
+      become_user: "{{ dev_user }}"
+      file:
+        src: $HOME/dotfiles/{{ item }}
+        dest: $HOME/.{{ item }}
+        state: link
+        force: yes
+      with_items:
+        - ctags 
+        - zshrc
+        - zshenv
+        - vimrc
+        - vim
+        - tmux.conf
+        - p10k.zsh
+        - gitconfig
+        - psqlrc
+      tags:
+        - home_env
+
+    - name: Ensure tmux is configured to allow ssh forwarding to work
+      become_user: "{{ dev_user }}"
+      lineinfile:
+        dest: $HOME/dotfiles/tmux.conf
+        regexp: 'set-environment.*SSH_AUTH_SOCK'
+        line: "set-environment -g 'SSH_AUTH_SOCK' ~/.ssh/ssh_auth_sock"
+      tags:
+        - ssh
+
+    - name: Set .ssh rc file
+      become_user: "{{ dev_user }}"
+      copy:
+        src: $HOME/dotfiles/sshrc
+        dest: $HOME/.ssh/rc
+        remote_src: yes
+      tags:
+        - ssh
+
+    - name: Create working directory
+      become_user: "{{ dev_user }}"
+      file:
+        path: $HOME/code
+        state: directory
+      when: c9_machine.stat.exists == False
+      tags:
+        - home_env
+
+    - name: Add direnv to .zshrc
+      become_user: "{{ dev_user }}"
+      lineinfile:
+        dest: $HOME/.zshrc
+        state: present
+        regexp: '^eval "$(direnv hook zsh)"'
+        line: 'eval "$(direnv hook zsh)"'
+      when: '"direnv" in packages'
+
+    - name: Install Cloud9
+      become_user: "{{ dev_user }}"
+      shell: curl -L https://raw.githubusercontent.com/c9/install/master/install.sh | bash
+      when: c9_machine.stat.exists == False
+      tags:
+        - cloud9
+
+    - include: auto-shutdown.yml
+      tags: shutdown
+
+    - name: Copy install-tmux script
+      # become_user: "{{ dev_user }}"
+      script: files/install-tmux.sh
+      tags:
+        - tmux

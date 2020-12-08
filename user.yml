@@ -1,0 +1,22 @@
+---
+- name: Add the dev group to the system
+  group: name={{ dev_user }} state=present
+  tags:
+    - user
+
+- name: Ensure dev_user exist and add to appropriate groups
+  user:
+    name: "{{ dev_user }}"
+    state: present
+    groups: "{{ dev_user }}, adm, {{ 'sudo' if ansible_distribution == 'Ubuntu' else 'wheel' }}"
+  tags:
+    - user
+
+- name: Add authorized key
+  authorized_key:
+    user: "{{ dev_user }}"
+    state: present
+    key: "{{ lookup('pipe', 'ssh-keygen -y -f ' + remote_access_pem) }}"
+  tags:
+    - key
+    - user

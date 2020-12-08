@@ -1,0 +1,12 @@
+---
+packages:
+  - "@Development tools"
+  - git
+  - jq
+  - htop
+  - the_silver_searcher
+  - python3
+  - zsh
+  - tmux
+  - tree
+  - vim
