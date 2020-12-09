@@ -176,15 +176,7 @@
       find:
         paths: $HOME
         hidden: yes
-        patterns:
-          - .ctags
-          - .zshrc
-          - .zshenv
-          - .vimrc
-          - .vim
-          - .tmux.conf
-          - .gitconfig
-          - .psqlrc
+        patterns: "{{ backup_files | map('regex_replace', '^(.*)', '.\\1') | list }}"
       register: dotfiles
       tags:
         - backup
@@ -207,16 +199,7 @@
         dest: $HOME/.{{ item }}
         state: link
         force: yes
-      with_items:
-        - ctags 
-        - zshrc
-        - zshenv
-        - vimrc
-        - vim
-        - tmux.conf
-        - p10k.zsh
-        - gitconfig
-        - psqlrc
+      with_items: "{{ backup_files }}"
       tags:
         - home_env
 

@@ -1,0 +1,14 @@
+---
+dev_user: dev
+dotfiles_repo: https://github.com/abest0/dotfiles
+backup_files:
+  - ctags 
+  - zshrc
+  - zshenv
+  - vimrc
+  - vim
+  - tmux.conf
+  - p10k.zsh
+  - gitconfig
+  - psqlrc
+
