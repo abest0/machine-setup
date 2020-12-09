@@ -12,3 +12,4 @@ packages:
   - tmux
   - tree
   - vim
+  - figlet
