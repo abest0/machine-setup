@@ -49,36 +49,30 @@ While this configuraiton of cloud resources could be used for any machine access
     1. Once the cloud resources are created, ensure that you can SSH to the machine
 
     ```
-    ssh <USER>@<MACHINE_LOCATION>
+    ❯ ssh <USER>@<MACHINE_LOCATION>
 
 
     # e.g. if using IP address
-    ssh ec2-user@192.168.0.1
+    ❯ ssh ec2-user@192.168.0.1
 
 
     # e.g. if using AWS instance-id to connect
-    ssh ec2-user@i-123456789012345
+    ❯ ssh ec2-user@i-123456789012345
     ```
 
 ### Provisioning the Development Machine
 
-1. Activate the pipenv virutal environment in the shell
-    ```
-    # activate the pipenv shell
-    pipenv shell
-    ```
-
-1. Use the provided ansible playbook to provision the machine. ***NOTE: 1) depending on the cloud OS and distribution you are using, the default username (specified by -u) may differ 2) Make sure the comma after the address of the machine is included.***
+1. Use the provided ansible playbook to provision the machine. ***NOTE: 1) depending on the cloud OS and distribution you are using, the default username (specified by -u) may differ
 
     ```
-    # run an ansible playbook agains the development environment
-    ansible-playbook -i <INSTANCE IP ADDRESS or URI>, -u ec2-user playbook.yml
+    # run an ansible playbook against the development environment
+    ❯ pipenv run setup <INSTANCE IP ADDRESS or URI> <name of default user if not ec2-user>
     ```
 
 
 This process will take some time, but you'll see the following output:
 
-    ❯ ansible-playbook -i 192.168.55.22, playbook.yml -u ec2-user
+    ❯ pipenv run setup 192.168.55.22
 
     PLAY [all] ****************************************************************************
 

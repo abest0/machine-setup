@@ -1,4 +1,6 @@
 ---
+user: ec2-user
+
 packages:
   - "@Development tools"
   - git
@@ -10,3 +12,4 @@ packages:
   - tmux
   - tree
   - vim
+  - figlet

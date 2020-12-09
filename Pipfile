@@ -14,4 +14,5 @@ boto = "*"
 python_version = "3.8"
 
 [scripts]
-galaxy-install = "ansible-galaxy install -r requirements.yml"
+galaxy-install = "ansible-galaxy install -r requirements.yml --force"
+setup = "sh -c 'ansible-playbook playbook.yml -i $0, -u ${1:-ec2-user}'"

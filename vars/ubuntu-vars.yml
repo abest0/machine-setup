@@ -1,4 +1,6 @@
 ---
+user: ubuntu
+
 packages:
   - build-essential
   - git
