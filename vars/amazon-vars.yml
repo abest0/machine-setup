@@ -1,4 +1,6 @@
 ---
+user: ec2-user
+
 packages:
   - "@Development tools"
   - git

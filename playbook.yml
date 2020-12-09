@@ -1,23 +1,17 @@
 ---
 - hosts: all
   become: yes
+  vars_files:
+    - "vars/defaults.yml"
+    - "vars/{{ ansible_distribution | lower }}-vars.yml"
 
-  vars:
-    dev_user: dev
-    remote_access_pem: ~/.ssh/laptop_112020.pem
+  vars_prompt:
+    - name: remote_access_pem
+      default: '{{ lookup("env", "SSH_PEM_PATH") | default("~/.ssh/id_rsa", True) }}'
+      private: no
+      prompt: "Please enter the path to the key pair needed to ssh to this instance"
 
   tasks:
-    - name: Gather os specific variables
-      include_vars: "{{ lookup('first_found', params) }}"
-      vars:
-        params:
-          files:
-            - "{{ ansible_distribution | lower}}-vars.yml"
-            - "{{ ansible_distribution | lower}}.yml"
-          paths:
-            - 'vars'
-      tags: vars
-
     - name: Allow 'wheel' group to have passwordless sudo
       lineinfile:
         dest: /etc/sudoers
@@ -152,7 +146,7 @@
     - name: Get dotfiles
       become_user: "{{ dev_user }}"
       git:
-        repo: https://github.com/abest0/dotfiles
+        repo: "{{ dotfiles_repo }}"
         dest: $HOME/dotfiles
         recursive: yes
         update: yes
