@@ -154,11 +154,17 @@
       tags:
         - dotfiles
 
+    - name: Get gitidentity
+      become: false
+      local_action: stat path={{ lookup('env', 'HOME') }}/dotfiles/gitidentity
+      register: gitidentity
+
     - name: Copy gitidentity
       become_user: "{{ dev_user }}"
       copy:
         src: "{{ lookup('env', 'HOME') }}/dotfiles/gitidentity"
         dest: $HOME/dotfiles/gitidentity
+      when: gitidentity.stat.exists
       tags:
         - dotfiles
 
@@ -254,3 +260,5 @@
       script: files/install-tmux.sh
       tags:
         - tmux
+
+    - include: vim.yml

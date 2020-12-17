@@ -1,5 +1,6 @@
 ---
 dev_user: dev
+vim_dir: $HOME/oss/vim
 dotfiles_repo: https://github.com/abest0/dotfiles
 backup_files:
   - ctags 

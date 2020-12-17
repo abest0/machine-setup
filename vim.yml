@@ -1,0 +1,63 @@
+---
+
+- name: Install vim depends
+  become: yes
+  package:
+    state: present
+    name:
+      - "@Development tools"
+      - ctags
+      - ncurses-devel
+      - git
+      - tcl-devel
+      - ruby
+      - ruby-devel
+      - lua
+      - lua-devel
+      - python
+      - python-devel
+      - perl
+      - perl-devel
+      - perl-ExtUtils-ParseXS
+      - perl-ExtUtils-CBuilder
+      - perl-ExtUtils-Embed
+
+
+- name: Ensure vim not installled
+  package:
+    state: absent
+    name:
+      - vim-enhanced 
+      - vim-common
+      - vim-filesystem
+
+- name: Get vim repo from git
+  git:
+    repo: https://github.com/vim/vim
+    dest: "{{ vim_dir }}" 
+
+- name: Configure vim
+  become: yes
+  command: 
+    argv:
+      - ./configure 
+      - --with-features=huge 
+      - --enable-multibyte
+      - --enable-rubyinterp
+      - --enable-pythoninterp
+      - --enable-perlinterp
+      - --enable-luainterp
+  args:
+    chdir: "{{ vim_dir }}"
+
+
+- name: Build the default target
+  become: yes
+  make:
+    chdir: "{{ vim_dir }}"
+
+- name: Run 'install' target as root
+  become: yes
+  make:
+    chdir: "{{ vim_dir }}"
+    target: install
