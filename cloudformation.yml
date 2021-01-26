@@ -25,7 +25,7 @@ Resources:
   EC2DevRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Ref EC2MLDevRoleName
+      RoleName: !Ref EC2DevRoleName
       Description: A base role for an EC2 Dev environment that allows EC2 to call services
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -42,7 +42,7 @@ Resources:
   EC2MLDevRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Ref EC2DevRoleName
+      RoleName: !Ref EC2MLDevRoleName
       Description: A base role for an EC2 Dev environment that allows EC2 to call ML services
       AssumeRolePolicyDocument:
         Version: 2012-10-17
