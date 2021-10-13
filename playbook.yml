@@ -59,6 +59,7 @@
         pip_install_packages:
           - pipenv
           - ipython
+          - git-remote-codecommit
       tags:
         - apps
         - pipenv
@@ -78,6 +79,9 @@
       vars:
         nodejs_install_npm_user: "{{ dev_user }}"
         ansible_distribution_major_version: 7
+        nodejs_npm_global_packages:
+          - aws-cdk
+          - typescript
       tags:
         - apps
 
