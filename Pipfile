@@ -15,4 +15,4 @@ python_version = "3"
 
 [scripts]
 galaxy-install = "ansible-galaxy install -r requirements.yml --force"
-setup = "sh -c 'ansible-playbook playbook.yml -i $0, -u ${1:-ec2-user}'"
+setup = "sh -c 'ansible-playbook playbook.yml -i $0, -u ${dev_user:-ec2-user} $@'"
