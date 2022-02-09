@@ -6,10 +6,9 @@
     - "vars/{{ ansible_distribution | lower }}-vars.yml"
 
   vars_prompt:
-    - name: remote_access_pem
-      default: '{{ lookup("env", "SSH_PEM_PATH") | default("~/.ssh/id_rsa", True) }}'
+    - name: ec2_ssh_key_secret_name
       private: no
-      prompt: "Please enter the path to the key pair needed to ssh to this instance"
+      prompt: "Please enter the secret name for the PUBLIC ssh key to ssh to this instance"
 
   tasks:
     - name: Allow 'wheel' group to have passwordless sudo
