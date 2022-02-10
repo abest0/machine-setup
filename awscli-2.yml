@@ -1,0 +1,20 @@
+---
+- name: Uninstall default aws cli
+  package:
+    name: 'awscli'
+    state: 'absent'
+  tags:
+    - awscli
+
+- name: Download & unzip awscli installation file
+  unarchive:
+    src: '{{ aws_cli_url }}'
+    dest: /tmp
+    remote_src: yes
+    creates: /tmp/aws
+
+- name: Installs aws cli
+  command: /tmp/aws/install
+  become: yes
+  args:
+    creates: /usr/local/bin/aws
