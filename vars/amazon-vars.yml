@@ -12,3 +12,5 @@ packages:
   - tmux
   - tree
   - vim
+  - name: nodejs
+    state: absent
