@@ -46,6 +46,15 @@
       loop: "{{ packages | flatten }}"
       tags:
         - dev
+        - node
+
+
+    - name: Ensure nodesource RPM does not exist
+      file:
+        path: etc/yum.repos.d/nodesource-el7.repo
+        state: absent
+      tags:
+        - node
 
     - name: Install jp
       get_url:
