@@ -1,9 +1,11 @@
 ---
-dev_user: dev
+dev_user: ec2_user
 vim_dir: $HOME/oss/vim
 dotfiles_repo: https://github.com/abest0/dotfiles
+aws_cli_url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+user_nodejs_version: '16.x'
 backup_files:
-  - ctags 
+  - ctags
   - zshrc
   - zshenv
   - vimrc
@@ -12,4 +14,3 @@ backup_files:
   - p10k.zsh
   - gitconfig
   - psqlrc
-

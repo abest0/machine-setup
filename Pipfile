@@ -11,9 +11,8 @@ ansible = "*"
 boto = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3"
 
 [scripts]
-create-roles = "sh -c 'aws cloudformation create-stack --stack-name ${1:-dev-roles} --template-body file://cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --region ${AWS_DEFAULT_REGION}'"
 galaxy-install = "ansible-galaxy install -r requirements.yml --force"
-setup = "sh -c 'ansible-playbook playbook.yml -i $0, -u ${1:-ec2-user}'"
+setup = "sh -c 'ansible-playbook playbook.yml -i $0, -u ${dev_user:-ec2-user} $@'"

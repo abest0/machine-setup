@@ -6,10 +6,9 @@
     - "vars/{{ ansible_distribution | lower }}-vars.yml"
 
   vars_prompt:
-    - name: remote_access_pem
-      default: '{{ lookup("env", "SSH_PEM_PATH") | default("~/.ssh/id_rsa", True) }}'
+    - name: ec2_ssh_key_secret_name
       private: no
-      prompt: "Please enter the path to the key pair needed to ssh to this instance"
+      prompt: "Please enter the secret name for the PUBLIC ssh key to ssh to this instance"
 
   tasks:
     - name: Allow 'wheel' group to have passwordless sudo
@@ -21,6 +20,8 @@
         validate: 'visudo -cf %s'
       tags:
         - admin
+
+    - include: awscli-2.yml
 
     - include: user.yml
 
@@ -39,10 +40,21 @@
       tags: dev
 
     - name: Install core dev packages
-      package: name={{ item }} state=latest
+      package:
+        name: "{{ item.name | default(item) }}"
+        state: "{{ item.state | default('latest') }}"
       loop: "{{ packages | flatten }}"
       tags:
         - dev
+        - node
+
+
+    - name: Ensure nodesource RPM does not exist
+      file:
+        path: etc/yum.repos.d/nodesource-el7.repo
+        state: absent
+      tags:
+        - node
 
     - name: Install jp
       get_url:
@@ -79,11 +91,13 @@
       vars:
         nodejs_install_npm_user: "{{ dev_user }}"
         ansible_distribution_major_version: 7
+        nodejs_version: "{{ user_nodejs_version }}"
         nodejs_npm_global_packages:
           - aws-cdk
           - typescript
       tags:
         - apps
+        - node
 
     - name: Get dev user home
       become_user: "{{ dev_user }}"
@@ -210,7 +224,7 @@
       tags:
         - backup
 
-    - name: Create symlinks
+    - name: Create dotfile symlinks
       become_user: "{{ dev_user }}"
       file:
         src: $HOME/dotfiles/{{ item }}

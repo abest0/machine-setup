@@ -2,7 +2,7 @@
 user: ec2-user
 
 packages:
-  - "@Development tools"
+  - '@Development tools'
   - git
   - jq
   - htop
@@ -12,4 +12,5 @@ packages:
   - tmux
   - tree
   - vim
-  - figlet
+  - name: nodejs
+    state: absent

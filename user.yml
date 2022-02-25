@@ -16,7 +16,7 @@
   authorized_key:
     user: "{{ dev_user }}"
     state: present
-    key: "{{ lookup('pipe', 'ssh-keygen -y -f ' + remote_access_pem) }}"
+    key: "{{ lookup('amazon.aws.aws_secret', 'ec2-ssh-key/' + ec2_ssh_key_secret_name + '/public') }}"
   tags:
     - key
     - user
