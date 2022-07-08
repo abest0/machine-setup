@@ -12,5 +12,6 @@ packages:
   - tmux
   - tree
   - vim
+  - openssl11-devel
   - name: nodejs
     state: absent
