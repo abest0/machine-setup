@@ -6,17 +6,8 @@
 
 - name: Ensure dev_user exist and add to appropriate groups
   user:
-    name: "{{ dev_user }}"
+    name: '{{ dev_user }}'
     state: present
     groups: "{{ dev_user }}, adm, {{ 'sudo' if ansible_distribution == 'Ubuntu' else 'wheel' }}"
   tags:
-    - user
-
-- name: Add authorized key
-  authorized_key:
-    user: "{{ dev_user }}"
-    state: present
-    key: "{{ lookup('amazon.aws.aws_secret', 'ec2-ssh-key/' + ec2_ssh_key_secret_name + '/public') }}"
-  tags:
-    - key
     - user
