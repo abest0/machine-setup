@@ -16,8 +16,6 @@
       tags:
         - admin
 
-    - include: awscli-2.yml
-
     - include: user.yml
 
     - import_role:
@@ -42,6 +40,8 @@
       tags:
         - dev
         - node
+
+    - include: awscli-2.yml
 
     - name: Ensure nodesource RPM does not exist
       file:

@@ -8,7 +8,7 @@
 
 - name: Download & unzip awscli installation file
   unarchive:
-    src: '{{ aws_cli_url }}'
+    src: 'https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip'
     dest: /tmp
     remote_src: yes
     creates: /tmp/aws
