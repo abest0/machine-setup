@@ -274,13 +274,6 @@
         line: 'eval "$(direnv hook zsh)"'
       when: '"direnv" in packages'
 
-    - name: Install Cloud9
-      become_user: '{{ dev_user }}'
-      shell: curl -L https://raw.githubusercontent.com/c9/install/master/install.sh | bash
-      when: c9_machine.stat.exists == False
-      tags:
-        - cloud9
-
     - include: auto-shutdown.yml
       tags: shutdown
 
