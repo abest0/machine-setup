@@ -73,12 +73,13 @@
     - import_role:
         name: ansible-role-docker
       vars:
-        docker_package: 'docker'
+        docker_package: '{{ docker_package }}'
         docker_users:
           - '{{ dev_user }}'
       tags:
         - apps
         - docker
+      when: ansible_distribution != 'Ubuntu'
 
     - import_role:
         name: geerlingguy.nodejs
@@ -131,12 +132,6 @@
       tags:
         - bashrc
         - pyenv
-
-    - name: Check if cloud9 node
-      become_user: '{{ dev_user }}'
-      stat: path=$HOME/.c9
-      register: c9_machine
-      tags: machine-role, shutdown
 
     - name: Check oh-my-zsh installed
       become_user: '{{ dev_user }}'
@@ -261,7 +256,6 @@
       file:
         path: $HOME/code
         state: directory
-      when: c9_machine.stat.exists == False
       tags:
         - home_env
 

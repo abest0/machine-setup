@@ -1,6 +1,5 @@
 ---
 user: ubuntu
-
 packages:
   - build-essential
   - git
@@ -12,6 +11,7 @@ packages:
   - tmux
   - tree
   - vim
+  - docker.io
   - direnv
-  - docker
   - libedit-dev
+  - unzip
