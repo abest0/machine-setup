@@ -2,8 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-CONFIG=$(cat /home/ubuntu/.c9/autoshutdown-configuration)
-SHUTDOWN_TIMEOUT=${CONFIG#*=}
+SHUTDOWN_TIMEOUT=30
 if ! [[ $SHUTDOWN_TIMEOUT =~ ^[0-9]*$ ]]; then
     echo "shutdown timeout is invalid"
     exit 1
