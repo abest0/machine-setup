@@ -33,7 +33,7 @@ is_vfs_connected() {
 }
 
 is_ssh_connected() {
-    netstat -tpna | grep 'ESTABLISHED.*sshd' >> /dev/null;
+    ss -tpna | grep 'ESTAB.*sshd' >> /dev/null;
 }
 
 isc=$(is_ssh_connected && echo "true" || echo "false")
