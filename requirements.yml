@@ -6,8 +6,7 @@ roles:
   - src: geerlingguy.nodejs
   - src: geerlingguy.pip
     version: 2.1.0
-  - name: ansible-role-docker
-    src: https://github.com/abest0/ansible-role-docker
+  - src: geerlingguy.docker
 
 collections:
   # Install a collection from Ansible Galaxy.
