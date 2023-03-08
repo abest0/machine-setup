@@ -12,7 +12,6 @@ packages:
   - tmux
   - tree
   - vim
-  - docker.io
   - direnv
   - libedit-dev
   - unzip

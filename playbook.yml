@@ -33,6 +33,7 @@
       tags: dev
 
     - name: Install core dev packages
+      become: yes
       package:
         name: '{{ item.name | default(item) }}'
         state: "{{ item.state | default('latest') }}"
@@ -66,20 +67,21 @@
           - pipenv
           - ipython
           - git-remote-codecommit
+          - poetry
+          - pre-commit
+
       tags:
         - apps
         - pipenv
 
     - import_role:
-        name: ansible-role-docker
+        name: geerlingguy.docker
       vars:
-        docker_package: '{{ docker_package }}'
         docker_users:
           - '{{ dev_user }}'
       tags:
         - apps
         - docker
-      when: ansible_distribution != 'Ubuntu'
 
     - import_role:
         name: geerlingguy.nodejs
@@ -90,6 +92,7 @@
         nodejs_npm_global_packages:
           - aws-cdk
           - typescript
+          - yarn
       tags:
         - apps
         - node
@@ -278,3 +281,4 @@
         - tmux
 
     - include: vim.yml
+      when: ansible_distribution == 'Amazon'
