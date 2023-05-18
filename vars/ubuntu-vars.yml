@@ -1,6 +1,5 @@
 ---
 user: ubuntu
-
 packages:
   - build-essential
   - git
@@ -8,10 +7,20 @@ packages:
   - silversearcher-ag
   - htop
   - python3
+  - ctags
   - zsh
   - tmux
   - tree
   - vim
   - direnv
-  - docker
   - libedit-dev
+  - unzip
+  - libbz2-dev
+  - liblzma-dev
+  - libsqlite3-dev
+  - libreadline-dev
+  - zlib1g-dev
+  - tk-dev
+  - llvm
+  - libssl-dev
+  - libffi-dev

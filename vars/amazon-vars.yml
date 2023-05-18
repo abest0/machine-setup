@@ -1,6 +1,6 @@
 ---
 user: ec2-user
-
+docker_package: docker
 packages:
   - '@Development tools'
   - git

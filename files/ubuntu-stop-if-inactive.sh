@@ -2,8 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-CONFIG=$(cat /home/ubuntu/.c9/autoshutdown-configuration)
-SHUTDOWN_TIMEOUT=${CONFIG#*=}
+SHUTDOWN_TIMEOUT=30
 if ! [[ $SHUTDOWN_TIMEOUT =~ ^[0-9]*$ ]]; then
     echo "shutdown timeout is invalid"
     exit 1
@@ -34,7 +33,7 @@ is_vfs_connected() {
 }
 
 is_ssh_connected() {
-    netstat -tpna | grep 'ESTABLISHED.*sshd' >> /dev/null;
+    ss -tpna | grep 'ESTAB.*sshd' >> /dev/null;
 }
 
 isc=$(is_ssh_connected && echo "true" || echo "false")
