@@ -75,7 +75,7 @@
         - pipenv
 
     - import_role:
-        name: geerlingguy.docker
+        name: ansible-role-docker
       vars:
         docker_users:
           - '{{ dev_user }}'
