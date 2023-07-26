@@ -2,7 +2,7 @@
 user: ec2-user
 docker_package: docker
 packages:
-  - "@Development tools"
+  - '@Development tools'
   - git
   - jq
   - htop
@@ -21,5 +21,3 @@ packages:
   - bzip2-libs.x86_64
   - libffi-devel.x86_64
   - readline-devel
-  - openssl-dev
-  - libffi-dev
