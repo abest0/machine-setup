@@ -2,7 +2,7 @@
 user: ec2-user
 docker_package: docker
 packages:
-  - '@Development tools'
+  - "@Development tools"
   - git
   - jq
   - htop
@@ -15,3 +15,11 @@ packages:
   - openssl11-devel
   - name: nodejs
     state: absent
+  - xz-devel
+  - libsqlite3x-devel.x86_64
+  - bzip2-devel.x86_64
+  - bzip2-libs.x86_64
+  - libffi-devel.x86_64
+  - readline-devel
+  - openssl-dev
+  - libffi-dev
