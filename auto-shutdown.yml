@@ -1,16 +1,39 @@
 ---
 - name: Add shutdown server shell file
   copy:
-    src: "files/{{ ansible_distribution | lower }}-stop-if-inactive.sh"
+    src: 'files/{{ ansible_distribution | lower }}-stop-if-inactive.sh'
     dest: /usr/local/sbin/stop-if-inactive.sh
     mode: u=rwx,g=r,o=r
   tags:
     - shutdown
 
-- name: Add cron job to execute shutdown script
-  cron:
-    name: 'shutdown when inactive'
-    job: /usr/local/sbin/stop-if-inactive.sh
-    user: root
+- name: Create systemd service to manage shutdown
+  copy:
+    src: files/auto-shutdown.service
+    dest: /etc/systemd/system
+    mode: 0755
+  tags:
+    - shutdown
+
+- name: Enable the auto-shutdown service
+  systemd:
+    name: auto-shutdown.service
+    enabled: false
+  tags:
+    - shutdown
+
+- name: Create systemd timer to manage shutdown
+  copy:
+    src: files/auto-shutdown.timer
+    dest: /etc/systemd/system
+    mode: 0755
+  tags:
+    - shutdown
+
+- name: Enable the auto-shutdown timer
+  systemd:
+    name: auto-shutdown.timer
+    enabled: true
+    state: started
   tags:
     - shutdown

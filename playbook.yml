@@ -18,13 +18,6 @@
 
     - include: user.yml
 
-    - import_role:
-        name: geerlingguy.repo-epel
-      vars:
-        epel_repo_url: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
-        epel_repo_gpg_key_url: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7'
-      when: ansible_distribution == 'Amazon'
-
     - name: Add an APT repo for updated packages
       apt_repository:
         repo: ppa:jonathonf/vim
@@ -59,20 +52,21 @@
       tags:
         - dev
 
-    - import_role:
-        name: geerlingguy.pip
-      vars:
-        pip_package: python3-pip
-        pip_install_packages:
-          - pipenv
-          - ipython
-          - git-remote-codecommit
-          - poetry
-          - pre-commit
-
+    - name: Ensure pip_install_packages are installed.
+      become_user: '{{ dev_user }}'
+      pip:
+        name: '{{ item.name | default(item) }}'
+        version: '{{ item.version | default(omit) }}'
+        virtualenv: '{{ item.virtualenv | default(omit) }}'
+        state: '{{ item.state | default(omit) }}'
+        extra_args: '{{ item.extra_args | default(omit) }}'
+      loop:
+        - ipython
+        - git-remote-codecommit
+        - pre-commit
+        - poetry
       tags:
-        - apps
-        - pipenv
+        - pip
 
     - import_role:
         name: ansible-role-docker
@@ -83,16 +77,30 @@
         - apps
         - docker
 
+    - name: Ensure npm global packages are installed.
+      npm:
+        name: '{{ item.name | default(item) }}'
+        version: '{{ item.version | default(omit) }}'
+        global: true
+        state: "{{ item.state | default('present') }}"
+      environment:
+        NPM_CONFIG_PREFIX: '{{ npm_config_prefix }}'
+        NODE_PATH: '{{ npm_config_prefix }}/lib/node_modules'
+        NPM_CONFIG_UNSAFE_PERM: '{{ npm_config_unsafe_perm }}'
+      when: ansible_distribution_version == "2023"
+      with_items: '{{ node_packages }}'
+      tags:
+        - apps
+        - node
+
     - import_role:
         name: geerlingguy.nodejs
       vars:
         nodejs_install_npm_user: '{{ dev_user }}'
-        ansible_distribution_major_version: 7
+        ansible_distribution_major_version: 8
         nodejs_version: '{{ user_nodejs_version }}'
-        nodejs_npm_global_packages:
-          - aws-cdk
-          - typescript
-          - yarn
+        nodejs_npm_global_packages: '{{ node_packages }}'
+      when: ansible_distribution_version != "2023"
       tags:
         - apps
         - node
@@ -279,6 +287,3 @@
       script: files/install-tmux.sh
       tags:
         - tmux
-
-    - include: vim.yml
-      when: ansible_distribution == 'Amazon'
