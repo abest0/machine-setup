@@ -1,0 +1,6 @@
+[Unit]
+Description="Manages EC2 automatic shutdown based on SSH status"
+
+[Service]
+ExecStart=/usr/local/sbin/stop-if-inactive.sh
+

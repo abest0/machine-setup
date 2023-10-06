@@ -1,0 +1,10 @@
+[Unit]
+Description="Run the auto-shutdown service every minute after boot"
+
+[Timer]
+Unit=auto-shutdown.service
+OnBootSec=1min
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target
