@@ -2,7 +2,8 @@
 dev_user: ec2_user
 vim_dir: $HOME/oss/vim
 dotfiles_repo: https://github.com/abest0/dotfiles
-user_nodejs_version: '16.x'
+npm_config_prefix: '/usr/local/lib/npm'
+npm_config_unsafe_perm: 'false'
 backup_files:
   - ctags
   - zshrc
