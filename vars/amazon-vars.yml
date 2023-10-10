@@ -21,8 +21,3 @@ packages:
   - bzip2-libs.x86_64
   - libffi-devel.x86_64
   - readline-devel
-
-node_packages:
-  - aws-cdk
-  - typescript
-  - yarn
