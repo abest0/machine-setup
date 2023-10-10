@@ -5,6 +5,10 @@
     - 'vars/defaults.yml'
     - 'vars/{{ ansible_distribution | lower }}-vars.yml'
 
+  handlers:
+    - name: local restart apache
+      service: name=apache2 state=restarted
+
   tasks:
     - name: Allow 'wheel' group to have passwordless sudo
       lineinfile:
@@ -156,3 +160,24 @@
       script: files/install-tmux.sh
       tags:
         - tmux
+
+    - import_role:
+        name: geerlingguy.apache
+      tags:
+        - apache
+
+    - import_role:
+        name: geerlingguy.mysql
+      vars:
+        mysql_databases:
+          - name: '{{ domain }}'
+        mysql_users:
+          - name: '{{ domain }}'
+            password: '1234'
+            host: '%'
+            priv: '{{ domain }}.*:ALL'
+      tags:
+        - mysql
+
+    - include: drupal.yml
+      tags: drupal

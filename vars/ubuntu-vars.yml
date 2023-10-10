@@ -1,5 +1,9 @@
 ---
 user: ubuntu
+domain: 'drupal'
+drupal_core_path: '/var/www/html/drupal'
+drupal_core_version: '9.3.13'
+drupal_site_name: 'Drupal Test'
 packages:
   - build-essential
   - git

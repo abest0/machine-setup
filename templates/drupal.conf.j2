@@ -1,0 +1,18 @@
+<VirtualHost *:80>
+
+  ServerAdmin webadmin@localhost
+
+  ServerName {{ domain }}.com
+  ServerAlias www.{{ domain }}.com
+  DocumentRoot {{ drupal_core_path }}/web
+
+  <Directory "{{ drupal_core_path }}/web">
+          Options Indexes FollowSymLinks
+          AllowOverride All
+          Require all granted
+  </Directory>
+
+  ErrorLog ${APACHE_LOG_DIR}/{{ domain }}.com_error.log
+  CustomLog ${APACHE_LOG_DIR}/{{ domain }}.com_access.log combined
+
+</VirtualHost>

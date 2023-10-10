@@ -1,0 +1,117 @@
+---
+- name: Install additional drupal packages
+  package:
+    name:
+      - acl
+      - php-common
+      - php-cli
+      - php-dev
+      - php-gd
+      - php-curl
+      - php-xml
+      - php-mbstring
+      - php-mysql
+      - php-json
+      - php-zip
+      - libapache2-mod-php
+
+# - name: Download & unzip drupal installation file
+#   unarchive:
+#     src: 'https://ftp.drupal.org/files/projects/drupal-{{ drupal_core_version}}.zip'
+#     dest: /var/www/html
+#     remote_src: yes
+#     creates: drupal-{{ drupal_core_version }}
+#   tags:
+#     - drupal
+#
+# - name: Copy drupal files to correct location
+#   copy:
+#     src: '/var/www/html/drupal-{{ drupal_core_version }}/'
+#     dest: '{{ drupal_core_path }}'
+#     remote_src: yes
+#     owner: www-data
+#     group: www-data
+#   tags:
+#     - drupal
+#   notify: local restart apache
+
+- name: Add apache virtualhost for Drupal
+  template:
+    src: templates/drupal.conf.j2
+    dest: /etc/apache2/sites-available/drupal.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - drupal
+  notify: local restart apache
+
+- name: Enable the Drupal site.
+  command: >
+    a2ensite {{ domain }}
+    creates=/etc/apache2/sites-enabled/{{ domain }}.conf
+  notify: local restart apache
+
+- name: Disable the default site.
+  command: >
+    a2dissite 000-default
+    removes=/etc/apache2/sites-enabled/000-default.conf
+  notify: local restart apache
+
+- name: Download Composer installer.
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/composer-installer.php
+    mode: 0755
+
+- name: Run Composer installer.
+  command: >
+    php composer-installer.php
+    chdir=/tmp
+    creates=/usr/local/bin/composer
+
+- name: Move Composer into globally-accessible location.
+  command: >
+    mv /tmp/composer.phar /usr/local/bin/composer
+    creates=/usr/local/bin/composer
+
+- name: Ensure Drupal directory exists.
+  file:
+    path: '{{ drupal_core_path }}'
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Check if Drupal project already exists.
+  stat:
+    path: '{{ drupal_core_path }}/composer.json'
+  register: drupal_composer_json
+
+- name: Create Drupal project.
+  composer:
+    command: create-project
+    arguments: drupal/recommended-project "{{ drupal_core_path }}"
+    working_dir: '{{ drupal_core_path }}'
+    no_dev: true
+  become_user: www-data
+  when: not drupal_composer_json.stat.exists
+
+- name: Add drush to the Drupal site with Composer.
+  composer:
+    command: require
+    arguments: drush/drush:12.*
+    working_dir: '{{ drupal_core_path }}'
+  become_user: www-data
+  when: not drupal_composer_json.stat.exists
+
+- name: Install Drupal.
+  become_user: www-data
+  command: >
+    vendor/bin/drush si -y --site-name="{{ drupal_site_name }}"
+    --account-name=admin
+    --account-pass=admin
+    --db-url=mysql://{{ domain }}:1234@localhost/{{ domain }}
+    --root={{ drupal_core_path }}/web
+    chdir={{ drupal_core_path }}
+    creates={{ drupal_core_path }}/web/sites/default/settings.php
+  notify: local restart apache
