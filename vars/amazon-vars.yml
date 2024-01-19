@@ -6,7 +6,6 @@ packages:
   - git
   - jq
   - htop
-  # - the_silver_searcher
   - python3
   - python3-pip
   - zsh
@@ -14,10 +13,10 @@ packages:
   - tree
   - vim
   - nodejs
-  # - openssl11-devel
   - xz-devel
-  # - libsqlite3x-devel.x86_64
   - bzip2-devel.x86_64
   - bzip2-libs.x86_64
   - libffi-devel.x86_64
   - readline-devel
+  - python3.11-devel
+  - pcre-devel
