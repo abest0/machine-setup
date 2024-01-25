@@ -7,7 +7,8 @@ packages:
   - silversearcher-ag
   - htop
   - python3
-  - ctags
+  - python3-pip
+  - exuberant-ctags
   - zsh
   - tmux
   - tree

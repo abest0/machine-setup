@@ -16,7 +16,7 @@
       tags:
         - admin
 
-    - include: user.yml
+    - include: tasks/user.yml
 
     - name: Add an APT repo for updated packages
       apt_repository:
@@ -35,7 +35,7 @@
         - dev
         - node
 
-    - include: awscli-2.yml
+    - include: tasks/awscli-2.yml
 
     - name: Ensure nodesource RPM does not exist
       file:
@@ -105,34 +105,6 @@
         - apps
         - node
 
-    - name: Get dev user home
-      become_user: '{{ dev_user }}'
-      shell: echo $HOME
-      register: dev_user_home
-
-    - name: Remove pyenv
-      become_user: '{{ dev_user }}'
-      file:
-        path: $HOME/.pyenv
-        state: absent
-
-    - name: Install pyenv
-      become_user: '{{ dev_user }}'
-      shell: curl https://pyenv.run | bash
-      tags:
-        - apps
-        - pyenv
-
-    - name: Add pyenv template
-      become_user: '{{ dev_user }}'
-      template:
-        src: templates/pyenvrc.j2
-        dest: $HOME/.pyenvrc
-        mode: u=rwx,g=rx,o=r
-      tags:
-        - bashrc
-        - pyenv
-
     - name: Update bashrc to source the pyenv extension
       become_user: '{{ dev_user }}'
       lineinfile:
@@ -169,117 +141,14 @@
       tags:
         - zsh
 
-    - name: Get dotfiles
-      become_user: '{{ dev_user }}'
-      git:
-        repo: '{{ dotfiles_repo }}'
-        dest: $HOME/dotfiles
-        recursive: yes
-        update: yes
-        force: yes
+    - include: tasks/home.yml
       tags:
         - dotfiles
-
-    - name: Get gitidentity
-      become: false
-      local_action: stat path={{ lookup('env', 'HOME') }}/dotfiles/gitidentity
-      register: gitidentity
-
-    - name: Copy gitidentity
-      become_user: '{{ dev_user }}'
-      copy:
-        src: "{{ lookup('env', 'HOME') }}/dotfiles/gitidentity"
-        dest: $HOME/dotfiles/gitidentity
-      when: gitidentity.stat.exists
-      tags:
-        - dotfiles
-
-    - name: Create dotfile back folder
-      become_user: '{{ dev_user }}'
-      file:
-        path: $HOME/backup_dotfiles
-        state: directory
-      register: backup_dir
-      tags:
         - backup
-
-    - name: Find files to backup
-      become_user: '{{ dev_user }}'
-      find:
-        paths: $HOME
-        hidden: yes
-        patterns: "{{ backup_files | map('regex_replace', '^(.*)', '.\\1') | list }}"
-      register: dotfiles
-      tags:
-        - backup
-
-    - name: Backup dotfiles
-      become_user: '{{ dev_user }}'
-      copy:
-        src: '{{ item.path }}'
-        dest: $HOME/backup_dotfiles
-        follow: yes
-        remote_src: yes
-      with_items: '{{ dotfiles.files }}'
-      tags:
-        - backup
-
-    - name: Create dotfile symlinks
-      become_user: '{{ dev_user }}'
-      file:
-        src: $HOME/dotfiles/{{ item }}
-        dest: $HOME/.{{ item }}
-        state: link
-        force: yes
-      with_items: '{{ backup_files }}'
-      tags:
         - home_env
-
-    - name: Ensure ~/.ssh exists
-      become_user: '{{ dev_user }}'
-      file:
-        path: $HOME/.ssh
-        state: directory
-      register: ssh_root
-      tags:
         - ssh
 
-    - name: Ensure tmux is configured to allow ssh forwarding to work
-      become_user: '{{ dev_user }}'
-      lineinfile:
-        dest: $HOME/dotfiles/tmux.conf
-        regexp: 'set-environment.*SSH_AUTH_SOCK'
-        line: "set-environment -g 'SSH_AUTH_SOCK' ~/.ssh/ssh_auth_sock"
-      tags:
-        - ssh
-
-    - name: Set .ssh rc file
-      become_user: '{{ dev_user }}'
-      copy:
-        src: $HOME/dotfiles/sshrc
-        dest: $HOME/.ssh/rc
-        remote_src: yes
-      tags:
-        - ssh
-
-    - name: Create working directory
-      become_user: '{{ dev_user }}'
-      file:
-        path: $HOME/code
-        state: directory
-      tags:
-        - home_env
-
-    - name: Add direnv to .zshrc
-      become_user: '{{ dev_user }}'
-      lineinfile:
-        dest: $HOME/.zshrc
-        state: present
-        regexp: '^eval "$(direnv hook zsh)"'
-        line: 'eval "$(direnv hook zsh)"'
-      when: '"direnv" in packages'
-
-    - include: auto-shutdown.yml
+    - include: tasks/auto-shutdown.yml
       tags: shutdown
 
     - name: Copy install-tmux script
