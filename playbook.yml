@@ -16,7 +16,7 @@
       tags:
         - admin
 
-    - include: tasks/user.yml
+    - include_tasks: tasks/user.yml
 
     - name: Add an APT repo for updated packages
       apt_repository:
@@ -35,7 +35,7 @@
         - dev
         - node
 
-    - include: tasks/awscli-2.yml
+    - include_tasks: tasks/awscli-2.yml
 
     - name: Ensure nodesource RPM does not exist
       file:
@@ -141,14 +141,14 @@
       tags:
         - zsh
 
-    - include: tasks/home.yml
+    - include_tasks: tasks/home.yml
       tags:
         - dotfiles
         - backup
         - home_env
         - ssh
 
-    - include: tasks/auto-shutdown.yml
+    - include_tasks: tasks/auto-shutdown.yml
       tags: shutdown
 
     - name: Copy install-tmux script
