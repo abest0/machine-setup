@@ -1,5 +1,4 @@
 ---
-dev_user: ec2_user
 vim_dir: $HOME/oss/vim
 dotfiles_repo: https://github.com/abest0/dotfiles
 user_nodejs_version: '18.x'

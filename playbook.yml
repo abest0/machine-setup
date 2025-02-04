@@ -18,12 +18,12 @@
 
     - include_tasks: tasks/user.yml
 
-    - name: Add an APT repo for updated packages
-      apt_repository:
-        repo: ppa:jonathonf/vim
-        state: present
-      when: ansible_distribution == 'Ubuntu'
-      tags: dev
+    # - name: Add an APT repo for updated packages
+    #   apt_repository:
+    #     repo: ppa:jonathonf/vim
+    #     state: present
+    #   when: ansible_distribution == 'Ubuntu'
+    #   tags: dev
 
     - name: Install core dev packages
       become: yes
@@ -32,8 +32,7 @@
         state: "{{ item.state | default('latest') }}"
       loop: '{{ packages | flatten }}'
       tags:
-        - dev
-        - node
+        - packages
 
     - include_tasks: tasks/awscli-2.yml
 
@@ -54,19 +53,17 @@
 
     - name: Ensure pip_install_packages are installed.
       become_user: '{{ dev_user }}'
-      pip:
+      community.general.pipx:
         name: '{{ item.name | default(item) }}'
-        version: '{{ item.version | default(omit) }}'
-        virtualenv: '{{ item.virtualenv | default(omit) }}'
-        state: '{{ item.state | default(omit) }}'
-        extra_args: '{{ item.extra_args | default(omit) }}'
-      loop:
-        - ipython
-        - git-remote-codecommit
-        - pre-commit
-        - poetry
+        state: '{{ item.state | default("latest") }}'
+      vars:
+        pipx_packages:
+          - ipython
+          - pre-commit
+          - poetry
+      with_items: '{{ pipx_packages }}'
       tags:
-        - pip
+        - pipx
 
     - import_role:
         name: ansible-role-docker

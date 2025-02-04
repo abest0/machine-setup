@@ -1,13 +1,16 @@
 ---
 user: ubuntu
+allow_world_readable_tmpfiles: true
 packages:
   - build-essential
+  - acl
   - git
   - jq
   - silversearcher-ag
   - htop
   - python3
   - python3-pip
+  - pipx
   - exuberant-ctags
   - zsh
   - tmux
