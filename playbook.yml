@@ -24,6 +24,19 @@
     #     state: present
     #   when: ansible_distribution == 'Ubuntu'
     #   tags: dev
+    - name: update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_pkg_mgr == "apt"
+      tags:
+        - packages
+
+    - name: update dnf cache
+      ansible.builtin.dnf:
+        update_cache: yes
+      when: ansible_pkg_mgr == "dnf"
+      tags:
+        - packages
 
     - name: Install core dev packages
       become: yes
