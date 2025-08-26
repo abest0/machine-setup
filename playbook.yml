@@ -65,9 +65,14 @@
         - dev
 
     - include_tasks: tasks/dev-tools.yml
+      vars:
+        dev_tools:
+          - { name: 'uv', url: 'https://astral.sh/uv/install.sh' }
+          - { name: 'pnpm', url: 'https://get.pnpm.io/install.sh' }
       tags:
-        - dev
+        - dev-tools
         - python
+        - node
 
     - name: Ensure pip_install_packages are installed.
       become_user: '{{ dev_user }}'

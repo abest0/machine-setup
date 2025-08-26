@@ -1,23 +1,34 @@
 ---
-- name: Check if uv is installed
+# Check if each development tool is already installed
+- name: Check if tool is installed
   become_user: '{{ dev_user }}'
-  shell: command -v uv
-  register: uv_check
+  shell: command -v {{ item.name }}
+  register: tool_check
   failed_when: false
   changed_when: false
+  loop: '{{ dev_tools }}'
+  tags:
+    - dev-tools
 
-- name: Download uv installer
+# Download installer scripts only for tools that aren't installed
+# Uses results from the previous check task
+- name: Download tool installer
   become_user: '{{ dev_user }}'
   get_url:
-    url: https://astral.sh/uv/install.sh
-    dest: /tmp/uv-install.sh
+    url: '{{ item.item.url }}'
+    dest: '/tmp/{{ item.item.name }}-install.sh'
     mode: '0755'
-  when: uv_check.rc != 0
-
-- name: Install uv
-  become_user: '{{ dev_user }}'
-  shell: /tmp/uv-install.sh
-  when: uv_check.rc != 0
+  when: item.rc != 0 # Only download if command -v failed (tool not found)
+  loop: '{{ tool_check.results }}'
   tags:
-    - dev
-    - python
+    - dev-tools
+
+# Execute installer scripts for tools that need to be installed
+# Uses the same results structure from the check task
+- name: Install tool
+  become_user: '{{ dev_user }}'
+  shell: '/tmp/{{ item.item.name }}-install.sh'
+  when: item.rc != 0 # Only install if command -v failed (tool not found)
+  loop: '{{ tool_check.results }}'
+  tags:
+    - dev-tools
