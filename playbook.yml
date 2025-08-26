@@ -6,12 +6,12 @@
     - 'vars/{{ ansible_distribution | lower }}-vars.yml'
 
   tasks:
-    - name: Allow 'wheel' group to have passwordless sudo
+    - name: Allow wheel/sudo group to have passwordless sudo
       lineinfile:
         dest: /etc/sudoers
         state: present
-        regexp: '^%wheel'
-        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        regexp: "^%{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
+        line: "%{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }} ALL=(ALL) NOPASSWD: ALL"
         validate: 'visudo -cf %s'
       tags:
         - admin
@@ -63,6 +63,16 @@
         mode: 'a+x'
       tags:
         - dev
+
+    - include_tasks: tasks/dev-tools.yml
+      vars:
+        dev_tools:
+          - { name: 'uv', url: 'https://astral.sh/uv/install.sh' }
+          - { name: 'pnpm', url: 'https://get.pnpm.io/install.sh' }
+      tags:
+        - dev-tools
+        - python
+        - node
 
     - name: Ensure pip_install_packages are installed.
       become_user: '{{ dev_user }}'

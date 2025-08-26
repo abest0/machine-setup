@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-SHUTDOWN_TIMEOUT=30
+SHUTDOWN_TIMEOUT=90
 if ! [[ $SHUTDOWN_TIMEOUT =~ ^[0-9]*$ ]]; then
     echo "shutdown timeout is invalid"
     exit 1
