@@ -1,0 +1,23 @@
+---
+- name: Download Amazon Q Developer
+  get_url:
+    url: 'https://desktop-release.q.us-east-1.amazonaws.com/latest/amazon-q.deb'
+    dest: '/tmp/amazon-q.deb'
+    mode: '0644'
+  tags:
+    - q
+
+- name: Install Amazon Q Developer
+  become: true
+  apt:
+    deb: '/tmp/amazon-q.deb'
+    state: present
+  tags:
+    - q
+
+- name: Clean up package file
+  file:
+    path: '/tmp/amazon-q.deb'
+    state: absent
+  tags:
+    - q
