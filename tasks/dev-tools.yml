@@ -1,0 +1,23 @@
+---
+- name: Check if uv is installed
+  become_user: '{{ dev_user }}'
+  shell: command -v uv
+  register: uv_check
+  failed_when: false
+  changed_when: false
+
+- name: Download uv installer
+  become_user: '{{ dev_user }}'
+  get_url:
+    url: https://astral.sh/uv/install.sh
+    dest: /tmp/uv-install.sh
+    mode: '0755'
+  when: uv_check.rc != 0
+
+- name: Install uv
+  become_user: '{{ dev_user }}'
+  shell: /tmp/uv-install.sh
+  when: uv_check.rc != 0
+  tags:
+    - dev
+    - python

@@ -64,6 +64,11 @@
       tags:
         - dev
 
+    - include_tasks: tasks/dev-tools.yml
+      tags:
+        - dev
+        - python
+
     - name: Ensure pip_install_packages are installed.
       become_user: '{{ dev_user }}'
       community.general.pipx:
