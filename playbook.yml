@@ -161,6 +161,11 @@
       tags:
         - zsh
 
+    - include_tasks: tasks/vim.yml
+      tags:
+        - vim
+        - dev
+
     - include_tasks: tasks/dev-pro.yml
       tags:
         - q
