@@ -28,6 +28,9 @@
 - name: Install tool
   become_user: '{{ dev_user }}'
   shell: '/tmp/{{ item.item.name }}-install.sh'
+  environment:
+    SHELL: /bin/bash
+    ENV: $HOME/.bashrc
   when: item.rc != 0 # Only install if command -v failed (tool not found)
   loop: '{{ tool_check.results }}'
   tags:
