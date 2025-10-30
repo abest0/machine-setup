@@ -3,9 +3,12 @@
   become: yes
   vars_files:
     - 'vars/defaults.yml'
-    - 'vars/{{ ansible_distribution | lower }}-vars.yml'
 
   tasks:
+    - name: Load distribution-specific variables
+      include_vars: 'vars/{{ ansible_distribution | lower }}-vars.yml'
+      when: ansible_distribution is defined
+
     - name: Allow wheel/sudo group to have passwordless sudo
       lineinfile:
         dest: /etc/sudoers
@@ -74,6 +77,24 @@
         - python
         - node
 
+    - name: Install/upgrade pipx to ensure version 1.7.0+
+      become_user: '{{ dev_user }}'
+      pip:
+        name: pipx>=1.7.0
+        state: latest
+        extra_args: --user --upgrade
+      tags:
+        - pipx
+
+    - name: Ensure pipx path is in PATH
+      become_user: '{{ dev_user }}'
+      lineinfile:
+        path: "/home/{{ dev_user }}/.bashrc"
+        line: 'export PATH="$HOME/.local/bin:$PATH"'
+        create: yes
+      tags:
+        - pipx
+
     - name: Ensure pip_install_packages are installed.
       become_user: '{{ dev_user }}'
       community.general.pipx:
@@ -83,7 +104,6 @@
         pipx_packages:
           - ipython
           - pre-commit
-          - poetry
       with_items: '{{ pipx_packages }}'
       tags:
         - pipx
@@ -120,6 +140,7 @@
         ansible_distribution_major_version: 8
         nodejs_version: '{{ user_nodejs_version }}'
         nodejs_npm_global_packages: '{{ node_packages }}'
+        nodejs_generate_etc_profile: false
       when: ansible_distribution_version != "2023"
       tags:
         - apps

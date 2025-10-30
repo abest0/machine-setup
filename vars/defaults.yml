@@ -1,5 +1,5 @@
 ---
-vim_dir: "/home/{{ dev_user }}/oss/vim"
+vim_dir: '/home/{{ dev_user }}/oss/vim'
 dotfiles_repo: https://github.com/abest0/dotfiles
 user_nodejs_version: '22.x'
 npm_config_prefix: '/usr/local/lib/npm'
@@ -18,4 +18,3 @@ backup_files:
 node_packages:
   - aws-cdk
   - typescript
-  - yarn
