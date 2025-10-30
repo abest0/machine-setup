@@ -16,26 +16,24 @@ The following prerequisites should be all you need to get started:
 
 - Clone this repository to your local machine
 
-- Install [pipenv](https://pypi.org/project/pipenv/)
-
-- Install [pyenv](https://github.com/pyenv/pyenv#installation)
+- Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 
 ### Local Environment Setup
 
-1. Running pipenv install will build the python virtualenv with all the dependencies necessary to configure a machine with ansible.
+1. Running uv sync will build the python virtualenv with all the dependencies necessary to configure a machine with ansible.
 
     ```
-    # initialize the pipenv virtual environment and install all required packages
-    pipenv install
+    # initialize the uv virtual environment and install all required packages
+    uv sync
     ```
 
 ***NOTE: Executing this command is only necessary the first time you are executing a playbook from a host machine.***
-1. The ansible playbook builds upon a number of [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html). Executing the following `pipenv` script calls `ansible-galaxy` command to install these dependencies.
+1. The ansible playbook builds upon a number of [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html). Executing the following command calls `ansible-galaxy` to install these dependencies.
 
     ```
     # install all dependent roles from ansible galaxy
-    pipenv run galaxy-install
+    uv run ansible-galaxy install -r requirements.yml --force
     ```
 
 ### Cloud Resources
@@ -66,13 +64,13 @@ While this configuraiton of cloud resources could be used for any machine access
 
     ```
     # run an ansible playbook against the development environment
-    ❯ pipenv run setup <INSTANCE IP ADDRESS or URI> <name of default user if not ec2-user>
+    ❯ uv run ansible-playbook playbook.yml -i <INSTANCE IP ADDRESS or URI>, -u <name of default user if not ec2-user>
     ```
 
 
 This process will take some time, but you'll see the following output:
 
-    ❯ pipenv run setup 192.168.55.22
+    ❯ uv run ansible-playbook playbook.yml -i 192.168.55.22,
 
     PLAY [all] ****************************************************************************
 

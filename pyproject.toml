@@ -1,18 +1,13 @@
-[tool.poetry]
+[project]
 name = "machine-setup"
 version = "0.1.0"
 description = "Setups up a dev environment using Ansible"
-authors = ["A. Best <bestadam@amazon.com>"]
+authors = [{name = "A. Best", email = "bestadam@amazon.com"}]
 readme = "README.md"
-packages = [{include = "machine_setup"}]
+requires-python = ">=3.10"
+dependencies = [
+    "ansible>=10.2.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-
-
-[tool.poetry.group.dev.dependencies]
-ansible = "^10.2.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+dev-dependencies = []
