@@ -1,11 +1,7 @@
 ---
-<<<<<<< HEAD
-vim_dir: $HOME/oss/vim
-=======
 vim_dir: '/home/{{ dev_user }}/oss/vim'
->>>>>>> 6ca8b0d (ansible updates)
 dotfiles_repo: https://github.com/abest0/dotfiles
-user_nodejs_version: '18.x'
+user_nodejs_version: '22.x'
 npm_config_prefix: '/usr/local/lib/npm'
 npm_config_unsafe_perm: 'false'
 backup_files:
