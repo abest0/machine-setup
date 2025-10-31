@@ -11,6 +11,7 @@
       - libxt-dev
       - libgtk-3-dev
       - libpython3-dev
+      - liblua5.3-dev
   when: ansible_distribution == 'Ubuntu'
   tags: vim
 
@@ -60,10 +61,26 @@
     version: master
   tags: vim
 
+- name: Configure vim build (Ubuntu method)
+  become_user: "{{ dev_user }}"
+  command:
+    argv:
+      - ./configure
+      - --with-features=huge
+      - --enable-multibyte
+      - --enable-python3interp=yes
+      - --enable-luainterp=yes
+      - --enable-cscope
+      - --prefix=/usr/local
+  args:
+    chdir: "{{ vim_dir }}"
+  when: ansible_distribution == 'Ubuntu'
+  tags: vim
+
 - name: Build vim (Ubuntu method)
   become_user: "{{ dev_user }}"
   make:
-    chdir: "{{ vim_dir }}/src"
+    chdir: "{{ vim_dir }}"
     jobs: "{{ ansible_processor_vcpus }}"
   when: ansible_distribution == 'Ubuntu'
   tags: vim
@@ -98,5 +115,5 @@
   become: yes
   command: make install
   args:
-    chdir: "{{ vim_dir + '/src' if ansible_distribution == 'Ubuntu' else vim_dir }}"
+    chdir: "{{ vim_dir }}"
   tags: vim
