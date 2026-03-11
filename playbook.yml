@@ -183,13 +183,10 @@
         - zsh
 
     - include_tasks: tasks/vim.yml
+      when: ansible_os_family == 'RedHat'
       tags:
         - vim
         - dev
-
-    - include_tasks: tasks/dev-pro.yml
-      tags:
-        - q
 
     - include_tasks: tasks/home.yml
       tags:
