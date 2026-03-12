@@ -72,6 +72,7 @@
         dev_tools:
           - { name: 'uv', url: 'https://astral.sh/uv/install.sh' }
           - { name: 'pnpm', url: 'https://get.pnpm.io/install.sh' }
+          - { name: 'claude', url: 'https://claude.ai/install.sh' }
       tags:
         - dev-tools
         - python
@@ -183,7 +184,6 @@
         - zsh
 
     - include_tasks: tasks/vim.yml
-      when: ansible_os_family == 'RedHat'
       tags:
         - vim
         - dev
