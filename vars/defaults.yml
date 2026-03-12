@@ -18,3 +18,4 @@ backup_files:
 node_packages:
   - aws-cdk
   - typescript
+  - name: '@anthropic-ai/claude-code'
